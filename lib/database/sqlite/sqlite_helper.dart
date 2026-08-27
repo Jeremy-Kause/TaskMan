@@ -1,6 +1,7 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'data_dummy.dart';
 import 'tables/category_table.dart';
 import 'tables/event_table.dart';
 import 'tables/habit_log_table.dart';
@@ -9,7 +10,7 @@ import 'tables/task_table.dart';
 
 class SqliteHelper {
   static const String _databaseName = 'taskman.db';
-  static const int _databaseVersion = 2; // ponytail: bumped for ERD v1.1
+  static const int _databaseVersion = 2;
 
   static final SqliteHelper instance = SqliteHelper._init();
 
@@ -37,13 +38,28 @@ class SqliteHelper {
     );
   }
 
-  // ponytail: categories first (FK dependency)
+  // ponytail: categories first (FK dependency) lalu seed data dummy terpusat
   Future<void> _onCreate(Database db, int version) async {
     await db.execute(CategoryTable.createTable);
     await db.execute(TaskTable.createTable);
     await db.execute(EventTable.createTable);
     await db.execute(HabitTable.createTable);
     await db.execute(HabitLogTable.createTable);
+
+    // Otomatis seed data dummy saat DB pertama kali dibuat
+    await DataDummy.seed(db);
+  }
+
+  /// Memastikan data dummy terisi jika tabel masih kosong
+  Future<void> seedIfEmpty() async {
+    final db = await database;
+    final taskCount = Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM ${TaskTable.tableName}'),
+    ) ?? 0;
+
+    if (taskCount == 0) {
+      await DataDummy.seed(db);
+    }
   }
 
   Future<String> getDatabasePath() async {

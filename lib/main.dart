@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'presentations/mainNavPres.dart';
+import 'database/sqlite/sqlite_helper.dart';
+import 'presentations/main_nav_pres.dart';
 import 'utils/app_theme.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // ponytail: inisialisasi DB & pastikan data dummy terisi
+  await SqliteHelper.instance.seedIfEmpty();
   runApp(const TaskmanApp());
 }
 

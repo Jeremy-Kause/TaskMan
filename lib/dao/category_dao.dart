@@ -1,6 +1,6 @@
-import '../database/sqlite/sqliteHelper.dart';
+import '../database/sqlite/sqlite_helper.dart';
 import '../database/sqlite/tables/category_table.dart';
-import '../models/Category.dart';
+import '../models/category.dart';
 
 class CategoryDAO {
   final _db = SqliteHelper.instance;

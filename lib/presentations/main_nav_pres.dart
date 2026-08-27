@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'eventPres.dart';
-import 'habitPres.dart';
-import 'profilePres.dart';
-import 'taskPres.dart';
+import 'event_pres.dart';
+import 'habit_pres.dart';
+import 'profile_pres.dart';
+import 'task_pres.dart';
 
 class MainNavPres extends StatefulWidget {
   const MainNavPres({super.key});

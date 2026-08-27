@@ -1,4 +1,4 @@
-import '../database/sqlite/sqliteHelper.dart';
+import '../database/sqlite/sqlite_helper.dart';
 import '../database/sqlite/tables/habit_log_table.dart';
 import '../models/habit_log.dart';
 

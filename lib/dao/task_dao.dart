@@ -1,4 +1,4 @@
-import '../database/sqlite/sqliteHelper.dart';
+import '../database/sqlite/sqlite_helper.dart';
 import '../database/sqlite/tables/task_table.dart';
 import '../models/task.dart';
 
