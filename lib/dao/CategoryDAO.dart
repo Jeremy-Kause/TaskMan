@@ -1,5 +1,5 @@
 import '../database/sqlite/sqliteHelper.dart';
-import '../database/sqlite/tabels/category_table.dart';
+import '../database/sqlite/tables/category_table.dart';
 import '../models/Category.dart';
 
 class CategoryDAO {

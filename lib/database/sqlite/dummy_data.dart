@@ -1,9 +1,9 @@
 import 'package:sqflite/sqflite.dart';
-import 'tabels/category_table.dart';
-import 'tabels/event_table.dart';
-import 'tabels/habit_log_table.dart';
-import 'tabels/habit_table.dart';
-import 'tabels/task_table.dart';
+import 'tables/category_table.dart';
+import 'tables/event_table.dart';
+import 'tables/habit_log_table.dart';
+import 'tables/habit_table.dart';
+import 'tables/task_table.dart';
 
 class DummyData {
   // ponytail: seed data sederhana untuk testing UI langsung tanpa input manual

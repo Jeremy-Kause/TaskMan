@@ -1,5 +1,5 @@
 import '../database/sqlite/sqliteHelper.dart';
-import '../database/sqlite/tabels/habit_log_table.dart';
+import '../database/sqlite/tables/habit_log_table.dart';
 import '../models/habit_log.dart';
 
 class HabitLogDAO {

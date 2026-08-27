@@ -1,5 +1,5 @@
 import '../database/sqlite/sqliteHelper.dart';
-import '../database/sqlite/tabels/task_table.dart';
+import '../database/sqlite/tables/task_table.dart';
 import '../models/task.dart';
 
 class TaskDAO {

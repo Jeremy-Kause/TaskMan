@@ -1,5 +1,5 @@
 import '../database/sqlite/sqliteHelper.dart';
-import '../database/sqlite/tabels/event_table.dart';
+import '../database/sqlite/tables/event_table.dart';
 import '../models/event.dart';
 
 class EventDAO {
