@@ -147,8 +147,8 @@ Taskman adalah aplikasi **standalone** yang berjalan secara lokal di perangkat m
 | **Deskripsi** | Sistem harus memungkinkan pengguna membuat tugas baru |
 | **Input** | Judul (wajib), Deskripsi (opsional), Deadline (wajib), Prioritas (wajib, default: Sedang), Jenis (wajib: Harian/Mingguan) |
 | **Proses** | Validasi input → Simpan ke database lokal → Jadwalkan notifikasi jika deadline diisi |
-| **Output** | Tugas baru muncul di daftar tugas pada Home Page |
-| **Pre-condition** | Pengguna berada di Home Page |
+| **Output** | Tugas baru muncul di daftar tugas pada Task Page |
+| **Pre-condition** | Pengguna berada di Task Page |
 | **Post-condition** | Data tugas tersimpan di tabel `tasks` |
 
 #### FR-02: Menampilkan Daftar Tugas
@@ -302,38 +302,44 @@ Taskman adalah aplikasi **standalone** yang berjalan secara lokal di perangkat m
 
 #### 4.1.1. Struktur Navigasi
 
-Aplikasi menggunakan **Bottom Navigation Bar** dengan 3 tab utama:
+Aplikasi menggunakan **Bottom Navigation Bar** dengan 4 tab utama:
 
 ```
-┌──────────────────────────────────────────┐
-│                 App Bar                  │
-│              (Judul Halaman)             │
-├──────────────────────────────────────────┤
-│                                          │
-│                                          │
-│              Konten Halaman              │
-│            (Body / SafeArea)             │
-│                                          │
-│                                          │
-├──────────────────────────────────────────┤
-│   🏠 Home    │  📅 Calendar  │  👤 Profile │
-│              │               │            │
-└──────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│                      App Bar                        │
+│                   (Judul Halaman)                   │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│                                                     │
+│                  Konten Halaman                     │
+│                (Body / SafeArea)                    │
+│                                                     │
+│                                                     │
+├─────────────────────────────────────────────────────┤
+│  ✅ Task   │  🔁 Habit   │  📅 Kalender  │  👤 Profil │
+└─────────────────────────────────────────────────────┘
 ```
 
 #### 4.1.2. Deskripsi Layar
 
-**A. Home Page**
+**A. Task Page**
 
 | Komponen | Deskripsi |
 |---|---|
-| Header | Sapaan pengguna dan tanggal hari ini |
-| Habit Section | Card horizontal (scroll) untuk quick check-in kebiasaan harian |
+| Header | Judul halaman dan tanggal hari ini |
 | Filter Tab | Tab: *Hari Ini* · *Minggu Ini* · *Prioritas* · *Selesai* |
 | Task List | Daftar tugas dengan checkbox, badge prioritas (warna), dan label deadline |
 | FAB (Floating Action Button) | Tombol `+` untuk menambah tugas baru |
 
-**B. Calendar Page**
+**B. Habit Page**
+
+| Komponen | Deskripsi |
+|---|---|
+| Header | Judul halaman |
+| Habit List | Daftar kebiasaan dengan tombol check-in, streak indicator, dan progress |
+| FAB | Tombol `+` untuk menambah kebiasaan baru |
+
+**C. Kalender / Event Page**
 
 | Komponen | Deskripsi |
 |---|---|
@@ -341,7 +347,7 @@ Aplikasi menggunakan **Bottom Navigation Bar** dengan 3 tab utama:
 | Detail Section | Daftar tugas dan event pada tanggal yang dipilih (di bawah kalender) |
 | FAB | Tombol `+` untuk menambah event baru |
 
-**C. Profile Page**
+**D. Profile Page**
 
 | Komponen | Deskripsi |
 |---|---|
@@ -638,7 +644,6 @@ lib/
 ├── components/            # Widget reusable (TaskCard, HabitCard, dll.)
 ├── controllers/           # State management / Providers
 │   ├── taskProvider.dart
-│   ├── agendaProvider.dart
 │   ├── eventProvider.dart
 │   └── habbitProvider.dart
 ├── dao/                   # Data Access Objects (CRUD operations)
@@ -657,11 +662,11 @@ lib/
 │   ├── Habit.dart
 │   └── habit_log.dart
 ├── presentations/         # Halaman utama (UI Screens)
-│   ├── mainNavPres.dart   # Wrapper navigasi (BottomNav)
-│   ├── homePres.dart
-│   ├── calenderPres.dart
-│   ├── agendaPres.dart
-│   └── profilePres.dart
+│   ├── mainNavPres.dart   # Wrapper navigasi (BottomNav, 4 tab)
+│   ├── taskPres.dart      # Tab 1: Manajemen tugas
+│   ├── habitPres.dart     # Tab 2: Habit tracker
+│   ├── eventPres.dart     # Tab 3: Kalender & event
+│   └── profilePres.dart   # Tab 4: Profil & statistik
 └── utils/                 # Utility functions
     ├── app_theme.dart     # Definisi tema & warna
     └── date_helper.dart   # Formatter tanggal Indonesia
@@ -707,22 +712,21 @@ lib/
 ├───────────────────────┤  │ - updatedAt: DateTime │  │ + fromMap(Map)        │
 │ + toMap(): Map        │  ├───────────────────────┤  │ + logToday()          │
 │ + fromMap(Map)        │  │ + toMap(): Map        │  └───────────┬───────────┘
-│ + toAgendaItem()      │  │ + fromMap(Map)        │              │
-└───────────────────────┘  │ + toAgendaItem()      │              │ 1:N
-                           └───────────────────────┘              ▼
+└───────────────────────┘  │ + fromMap(Map)        │              │
+                           └───────────────────────┘              │ 1:N
+                                                                  ▼
                                                       ┌───────────────────────┐
-          ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐                 │      HabitLog         │
-              «interface»                              ├───────────────────────┤
-          │     AgendaItem         │                   │ - id: int?            │
-          ├ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┤                  │ - habitId: int        │
-          │ + title: String        │                   │ - checkInDate: DTime  │
-          │ + time: DateTime       │                   │ - isDone: bool        │
-          │ + type: String         │                   │ - createdAt: DateTime?│
-          └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘                  ├───────────────────────┤
-               ▲             ▲                         │ + toMap(): Map        │
-               │             │                         │ + fromMap(Map)        │
-          Task.toAgendaItem  ScheduleEvent             └───────────────────────┘
-                              .toAgendaItem
+                                                      │      HabitLog         │
+                                                      ├───────────────────────┤
+                                                      │ - id: int?            │
+                                                      │ - habitId: int        │
+                                                      │ - checkInDate: DTime  │
+                                                      │ - isDone: bool        │
+                                                      │ - createdAt: DateTime?│
+                                                      ├───────────────────────┤
+                                                      │ + toMap(): Map        │
+                                                      │ + fromMap(Map)        │
+                                                      └───────────────────────┘
 
 ════════════════════════════════════════════════════════════════════════
                        DATA ACCESS (DAO)
@@ -777,22 +781,8 @@ lib/
                    CONTROLLERS (PROVIDERS)
 ════════════════════════════════════════════════════════════════════════
 
-┌──────────────────────────────┐
-│       AgendaProvider         │
-│     (extends ChangeNotifier) │
-├──────────────────────────────┤
-│ - _taskDAO: TaskDAO          │
-│ - _eventDAO: ScheduleEventDAO│
-│ + items: List<AgendaItem>    │
-├──────────────────────────────┤
-│ + refresh(DateTime date)     │
-│ + getItemsForDate(DateTime)  │
-└──────────────────────────────┘
-        │ uses
-        ├──────────────────────────────────────┐
-        ▼                                      ▼
 ┌──────────────────────────┐  ┌──────────────────────────┐
-│      TaskProvider        │  │   ScheduleProvider       │
+│      TaskProvider        │  │     EventProvider        │
 │  (extends ChangeNotifier)│  │  (extends ChangeNotifier) │
 ├──────────────────────────┤  ├──────────────────────────┤
 │ - _dao: TaskDAO          │  │ - _dao: ScheduleEventDAO │
@@ -806,17 +796,17 @@ lib/
 └──────────────────────────┘  └──────────────────────────┘
 
 ┌──────────────────────────┐
-│     HabitProvider         │
-│  (extends ChangeNotifier) │
+│     HabitProvider        │
+│  (extends ChangeNotifier)│
 ├──────────────────────────┤
-│ - _habitDAO: HabitDAO     │
-│ - _logDAO: HabitLogDAO    │
-│ + habits: List<Habit>     │
+│ - _habitDAO: HabitDAO    │
+│ - _logDAO: HabitLogDAO   │
+│ + habits: List<Habit>    │
 ├──────────────────────────┤
-│ + addHabit(Habit)         │
-│ + logHabit(int habitId)   │
-│ + fetchAll()              │
-│ + getStreak(int): int     │
+│ + addHabit(Habit)        │
+│ + logHabit(int habitId)  │
+│ + fetchAll()             │
+│ + getStreak(int): int    │
 └──────────────────────────┘
 ```
 
@@ -828,12 +818,11 @@ lib/
 | **Controllers** | **DAO** | Provider memanggil DAO untuk operasi database |
 | **DAO** | **Models** | DAO menerima dan mengembalikan data dalam bentuk Model |
 | **DAO** | **Database (SqliteHelper)** | DAO mengakses database melalui SqliteHelper |
-| **Task & ScheduleEvent** | **AgendaItem** | Kedua model bisa dikonversi ke AgendaItem melalui method `toAgendaItem()` untuk tampilan kalender/agenda yang terpadu |
 
 ### 7.4. Sequence Diagram — Membuat Tugas Baru
 
 ```
-Pengguna       HomePres       TaskForm       TaskProvider     TaskDAO       Database
+Pengguna       TaskPres       TaskForm       TaskProvider     TaskDAO       Database
    │               │              │              │              │              │
    │  Tap FAB "+"  │              │              │              │              │
    │──────────────>│              │              │              │              │
@@ -870,12 +859,12 @@ Pengguna       HomePres       TaskForm       TaskProvider     TaskDAO       Data
           └────┬────┘
                ▼
     ┌─────────────────────┐
-    │  Buka Home Page     │
+    │  Buka Habit Page    │
     └──────────┬──────────┘
                ▼
     ┌─────────────────────┐
     │  Lihat daftar habit │
-    │  di Habit Section   │
+    │  di Habit Page      │
     └──────────┬──────────┘
                ▼
     ┌─────────────────────┐
@@ -932,10 +921,10 @@ Pengguna       HomePres       TaskForm       TaskProvider     TaskDAO       Data
     └──────────┬──────────┘
                ▼
     ┌─────────────────────┐
-    │  AgendaProvider     │
-    │  query tasks &      │
-    │  schedule_events    │
-    │  → List<AgendaItem> │
+    │  EventProvider      │
+    │  query events untuk │
+    │  tanggal tertentu   │
+    │  → List<Event>      │
     └──────────┬──────────┘
                ▼
        ┌───────────────┐
@@ -945,9 +934,8 @@ Pengguna       HomePres       TaskForm       TaskProvider     TaskDAO       Data
                ▼             │ Tampilkan    │
     ┌─────────────────┐      │ "Tidak ada   │
     │ Tampilkan list  │      │  kegiatan"   │
-    │ AgendaItem      │      └──────┬───────┘
-    │ (tasks + events │             │
-    │  terpadu)       │             │
+    │ event pada      │      └──────┬───────┘
+    │ tanggal terpilih│             │
     └──────────┬──────┘             │
                ▼                    │
           ┌─────────┐               │
@@ -963,3 +951,4 @@ Pengguna       HomePres       TaskForm       TaskProvider     TaskDAO       Data
 |---|---|---|---|
 | 1.0 | 25 Agustus 2026 | Jeremy Zadrimman Kause | Pembuatan dokumen SRS awal |
 | 1.1 | 27 Agustus 2026 | Jeremy Zadrimman Kause | Pembaruan ERD (tambah tabel categories, rename events → schedule_events, tambah dukungan event berulang), pembaruan Class Diagram (tambah Provider layer, AgendaItem interface), penyesuaian struktur direktori sesuai implementasi aktual |
+| 1.2 | 28 Agustus 2026 | Jeremy Zadrimman Kause | Restrukturisasi navigasi dari 3 tab menjadi 4 tab (Task, Habit, Kalender/Event, Profil). Penghapusan file dan konsep agenda (`agendaPres.dart`, `agendaProvider.dart`, `AgendaItem`) untuk menyederhanakan arsitektur sistem langsung ke 3 domain utama: Task, Habit, dan Event. |

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class HomePres extends StatelessWidget {
-  const HomePres({super.key});
+class HabitPres extends StatelessWidget {
+  const HabitPres({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: Center(child: Text('Home')),
+      body: Center(child: Text('Habit')),
     );
   }
 }

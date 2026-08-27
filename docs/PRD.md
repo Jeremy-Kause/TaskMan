@@ -35,7 +35,7 @@ Aplikasi **Taskman** hadir sebagai solusi untuk membantu pengguna mengelola tuga
 
 ### a. MVP (Minimum Viable Product)
 
-- [ ] Navigasi utama (Home, Calendar, Profile)
+- [ ] Navigasi utama (Task, Habit, Kalender/Event, Profil)
 - [ ] **Manajemen Tugas (Task)**
   - [ ] Membuat, mengedit, dan menghapus tugas
   - [ ] Menentukan jenis tugas: harian atau mingguan
@@ -82,7 +82,7 @@ Aplikasi **Taskman** hadir sebagai solusi untuk membantu pengguna mengelola tuga
 - **Sebagai** pengguna, **saya ingin** memisahkan tugas harian dan mingguan, **sehingga** saya bisa fokus pada tugas hari ini tanpa kewalahan.
 
 ### Kalender & Event
-- **Sebagai** mahasiswa, **saya ingin** melihat semua tugas dan event di kalender, **sehingga** saya bisa melihat jadwal secara keseluruhan dalam satu tampilan.
+- **Sebagai** mahasiswa, **saya ingin** melihat semua tugas dan event di halaman kalender, **sehingga** saya bisa melihat jadwal secara keseluruhan dalam satu tampilan.
 - **Sebagai** pengguna, **saya ingin** menambahkan event ke tanggal tertentu, **sehingga** saya bisa mencatat jadwal kuliah, meeting, atau kegiatan penting.
 
 ### Habit Tracker

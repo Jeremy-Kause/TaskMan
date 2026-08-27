@@ -10,9 +10,8 @@
 
 - Manajemen **Task** (tugas harian/mingguan/bulanan)
 - Manajemen **Habit** (kebiasaan harian dengan logging)
-- Manajemen **Event** (agenda/kegiatan dengan waktu)
-- **Kalender** untuk visualisasi jadwal
-- **Profil** pengguna
+- Manajemen **Event** (jadwal kegiatan & kalender)
+- **Profil** pengguna & statistik produktivitas
 
 **Database**: SQLite (lokal via `sqflite`), dengan persiapan untuk Supabase (cloud sync di masa depan).
 
@@ -30,7 +29,7 @@ lib/
 │   │   └── tabels/         # Definisi tabel SQL
 │   └── supabase/           # (Dipersiapkan untuk cloud sync)
 ├── dao/                    # Data Access Object – operasi CRUD
-├── controlers/             # Controller – logika bisnis & state management
+├── controllers/            # Controller / Provider – logika bisnis & state management
 ├── presentations/          # Halaman / layar utama (UI Screen)
 ├── components/             # Widget kecil yang reusable
 ├── hooks/                  # Custom hooks / lifecycle helpers
@@ -74,9 +73,10 @@ lib/
 **File yang ada**:
 | File               | Deskripsi                       |
 |--------------------|---------------------------------|
+| `Category.dart`    | Model kategori pengelompokan    |
 | `Task.dart`        | Model tugas dengan prioritas & deadline |
 | `Habit.dart`       | Model kebiasaan harian          |
-| `Event.dart`       | Model agenda/kegiatan           |
+| `Event.dart`       | Model kegiatan/event            |
 | `habit_log.dart`   | Model log check-in habit harian |
 
 ---
@@ -126,9 +126,9 @@ lib/
 
 ---
 
-### 3.5 `controlers/` – Controllers (Logika Bisnis & State)
+### 3.5 `controllers/` – Controllers / Providers (Logika Bisnis & State)
 
-**Fungsi**: Menjembatani antara **UI (presentations)** dan **Data (dao)**. Controller mengelola state aplikasi dan menjalankan logika bisnis.
+**Fungsi**: Menjembatani antara **UI (presentations)** dan **Data (dao)**. Controller/Provider mengelola state aplikasi dan menjalankan logika bisnis.
 
 **Tanggung jawab**:
 - Memanggil method dari DAO
@@ -138,17 +138,17 @@ lib/
 - Mengelola loading state, error handling
 
 **Aturan**:
-- Satu controller per fitur/modul (contoh: `task_controller.dart`, `habit_controller.dart`)
-- **Presentations TIDAK boleh memanggil DAO langsung** – harus melalui Controller
-- Gunakan `ChangeNotifier` atau state management pattern yang konsisten
+- Satu provider per fitur/modul (contoh: `taskProvider.dart`, `habbitProvider.dart`)
+- **Presentations TIDAK boleh memanggil DAO langsung** – harus melalui Controller/Provider
+- Gunakan `ChangeNotifier` + `Provider` secara konsisten
 - Tidak boleh berisi kode UI (Widget, BuildContext)
 
-**Contoh file yang harus dibuat**:
+**File yang ada**:
 | File                    | Deskripsi                              |
 |-------------------------|----------------------------------------|
-| `task_controller.dart`  | State & aksi untuk manajemen tugas     |
-| `habit_controller.dart` | State & aksi untuk kebiasaan + log     |
-| `event_controller.dart` | State & aksi untuk agenda/kegiatan     |
+| `taskProvider.dart`     | State & aksi untuk manajemen tugas     |
+| `habbitProvider.dart`   | State & aksi untuk kebiasaan + log     |
+| `eventProvider.dart`    | State & aksi untuk kalender & event    |
 
 ---
 
@@ -167,10 +167,11 @@ lib/
 **File yang ada**:
 | File                  | Deskripsi                         |
 |-----------------------|-----------------------------------|
-| `homePres.dart`       | Halaman utama / dashboard         |
-| `calenderPres.dart`   | Halaman kalender & jadwal         |
+| `taskPres.dart`       | Halaman manajemen tugas           |
+| `habitPres.dart`      | Halaman habit tracker             |
+| `eventPres.dart`      | Halaman kalender & event          |
 | `profilePres.dart`    | Halaman profil pengguna           |
-| `mainNavPres.dart`    | Wrapper navigasi (BottomNav/Tab)  |
+| `mainNavPres.dart`    | Wrapper navigasi (BottomNav/4 Tab)|
 
 ---
 
@@ -233,17 +234,17 @@ lib/
                        │ interaksi (tap, input)
                        ▼
 ┌─────────────────────────────────────────────────────────┐
-│  PRESENTATIONS (homePres, calenderPres, profilePres)    │
+│  PRESENTATIONS (taskPres, habitPres, eventPres, ...)    │
 │  → Menampilkan UI, menerima input user                  │
 │  → Menggunakan widget dari COMPONENTS                   │
 └──────────────────────┬──────────────────────────────────┘
                        │ panggil aksi / baca state
                        ▼
 ┌─────────────────────────────────────────────────────────┐
-│  CONTROLLERS (task_controller, habit_controller)        │
+│  CONTROLLERS (taskProvider, habbitProvider, eventProv)  │
 │  → Mengelola state & logika bisnis                      │
 │  → Validasi data                                        │
-│  → Notify UI saat data berubah                          │
+│  → Notify UI saat data berubah (`notifyListeners()`)    │
 └──────────────────────┬──────────────────────────────────┘
                        │ panggil CRUD
                        ▼
@@ -273,8 +274,8 @@ lib/
 |----------------|-------------------|-----------------------------|
 | File Model     | `PascalCase.dart` | `Task.dart`, `Habit.dart`   |
 | File DAO       | `PascalCaseDAO.dart` | `TaskDAO.dart`           |
-| File Controller| `snake_case_controller.dart` | `task_controller.dart` |
-| File Presentation | `camelCasePres.dart` | `homePres.dart`       |
+| File Provider  | `camelCaseProvider.dart` | `taskProvider.dart`   |
+| File Presentation | `camelCasePres.dart` | `taskPres.dart`       |
 | File Component | `snake_case.dart` | `task_card.dart`            |
 | File Util      | `snake_case.dart` | `date_helper.dart`          |
 | File Tabel DB  | `snake_case_table.dart` | `task_table.dart`      |
@@ -293,13 +294,13 @@ lib/
 
 ### 6.2 Dependensi Antar Layer
 ```
-models      → tidak bergantung pada apapun
-database    → bergantung pada models (untuk definisi tabel)
-dao         → bergantung pada database + models
-controlers  → bergantung pada dao + models
-components  → bergantung pada models (untuk type parameter)
-presentations → bergantung pada controlers + components + models
-utils       → tidak bergantung pada layer lain (berdiri sendiri)
+models        → tidak bergantung pada apapun
+database      → bergantung pada models (untuk definisi tabel)
+dao           → bergantung pada database + models
+controllers   → bergantung pada dao + models
+components    → bergantung pada models (untuk type parameter)
+presentations → bergantung pada controllers + components + models
+utils         → tidak bergantung pada layer lain (berdiri sendiri)
 ```
 
 ### 6.3 State Management

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'calenderPres.dart';
-import 'homePres.dart';
+import 'eventPres.dart';
+import 'habitPres.dart';
 import 'profilePres.dart';
+import 'taskPres.dart';
 
 class MainNavPres extends StatefulWidget {
   const MainNavPres({super.key});
 
   @override
-  State<MainNavPres> createState(){
+  State<MainNavPres> createState() {
     return _MainNavPresState();
   }
 }
@@ -17,7 +18,8 @@ class _MainNavPresState extends State<MainNavPres> {
 
   // ponytail: IndexedStack menjaga state tab tetap aktif tanpa re-build berlebihan
   final List<Widget> _pages = const [
-    HomePres(),
+    TaskPres(),
+    HabitPres(),
     CalenderPres(),
     ProfilePres(),
   ];
@@ -35,9 +37,14 @@ class _MainNavPresState extends State<MainNavPres> {
         onDestinationSelected: (index) => setState(() => _currentIndex = index),
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
+            icon: Icon(Icons.task_alt_outlined),
+            selectedIcon: Icon(Icons.task_alt),
+            label: 'Task',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.repeat_outlined),
+            selectedIcon: Icon(Icons.repeat),
+            label: 'Habit',
           ),
           NavigationDestination(
             icon: Icon(Icons.calendar_month_outlined),
