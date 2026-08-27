@@ -1,10 +1,6 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-// ==================== [DUMMY DATA - TESTING ONLY] ====================
-// Hapus atau comment baris import ini jika tidak lagi butuh dummy data
-import 'dummy_data.dart';
-// =====================================================================
 import 'tables/category_table.dart';
 import 'tables/event_table.dart';
 import 'tables/habit_log_table.dart';
@@ -41,18 +37,13 @@ class SqliteHelper {
     );
   }
 
-  // ponytail: categories first (FK dependency), lalu isi dummy data untuk testing UI
+  // ponytail: categories first (FK dependency)
   Future<void> _onCreate(Database db, int version) async {
     await db.execute(CategoryTable.createTable);
     await db.execute(TaskTable.createTable);
     await db.execute(EventTable.createTable);
     await db.execute(HabitTable.createTable);
     await db.execute(HabitLogTable.createTable);
-
-    // ==================== [DUMMY DATA - TESTING ONLY] ====================
-    // Hapus atau comment baris berikut untuk menonaktifkan isi data dummy otomatis
-    await DummyData.seed(db);
-    // =====================================================================
   }
 
   Future<String> getDatabasePath() async {
